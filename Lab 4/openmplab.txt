@@ -1,0 +1,54 @@
+Jack Storch
+304483390
+
+Open MP Lab
+
+For this lab, I began by loading the file in the seas net linux server using the scp command and the tar -zxvf command to then open this tarball.
+I then read about how Open MP works through the companies slides as well as piazza. 
+
+I then ran the function under gprof by typing:
+
+make seq GPROF=1
+gprof seq
+
+This gave me a detailed visual of how much each function was taking up of the overall function time with func1 being far in the lead.
+I then typed:
+
+make clean	//gets rid of all the files and executables made
+make omp
+./omp
+
+to make a new executable using Open MP. This also lets me see the time it takes to run which happens to be .6 seconds for Func.
+
+The first two improvements I made were to put:
+
+#pragma omp parallel for
+
+in front of the for loop in func0 as well as the first for loop in func1.
+
+These two, although mostly due to the optimization placed in func1, brought down the time to .54 seconds.
+
+I then tried to optimize Func3 by putting the:
+
+	#pragma omp parallel for
+
+in front of the first and last for loops in that function. I then also used:
+
+	#pragma omp parallel for reduction(+:sumWeights)
+
+for the middle for loop to run the whole function in parallel. Even with all theses improvements, I received little to no improvement. 
+I had to used the reduction(+:sumWeights) because it allow each thread to run and then have all there values added together after.
+
+Finally, I optimized the large for loop in Func1 by adding:
+
+	#pragma omp parallel for private(j,index_X,index_Y)
+
+to the beginning of the loop. I struggled with this for a while as I did not know what variables needed to be private and what needed to be shared.
+Once I figured this out, it became simple and this finisihed the project dropping the time from .54 to .11.
+
+This in the end, gave me a 5.45x speed increase to my func.c when compared to the non Open MP version.
+
+I then tried even more optimization but found that it either didn’t help at all or actually made the program not work correctly.
+
+For memory purposes I am under the impression that we do not need to worry about that piece too much and my program does not leak very much or ofter at all. But it does a little.
+I am not sure what is causing the memory leak and I'm not sure if its even func.c as there were memory leaks even before using Open MP.

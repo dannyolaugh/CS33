@@ -1,0 +1,56 @@
+
+56
+A. which registers hold program values x, n, result, and mask?
+esi = x, ebx = n, edi = result, edx = mask
+
+B. Initial value of result is -1. Initial value of mask is 1.
+
+C. What is the test condition for mask? If mask is not equal to zero jump to L2
+
+D. How does mask get updated? It equals itself left shifted by n after each iteration of the loop
+
+E. How does result get updated? Result gets xor'ed with (x & mask).
+
+F.
+
+int loop(int x, int n)
+{
+	int result = -1;
+	int mask;
+	for(mask = 1; mask != 0; mak = mask << n)
+	{
+		result = result^(x & mask);
+	}
+	return result; 
+}
+
+
+59
+
+int switch_prob(int x, int n)
+{
+	int result = x;
+
+	switch (n)
+	{
+		case 50:
+		case 52:
+			result <<=2;
+			break;
+		case 53:
+			result >>=2;
+			break;
+
+		case 54:
+			result *= 3; 
+			break;
+
+		default:
+			result += 10;
+			break;
+	}
+
+	return result;
+}
+
+
